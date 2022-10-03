@@ -1,0 +1,28 @@
+{
+  "name": "teedata-discord-bot",
+  "version": "1.0.0",
+  "description": "Teedata Discord bot",
+  "main": "build/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts",
+    "start": "node ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Teeskins/teedata-discordbot.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Teeskins/teedata-discordbot.git/issues"
+  },
+  "homepage": "https://github.com/Teeskins/teedata-discordbot.git#readme",
+  "dependencies": {
+    "discord.js": "^14.3.0",
+    "dotenv": "^10.0.0",
+    "fs": "^0.0.1-security",
+    "mongoose": "^6.5.2",
+    "path": "^0.12.7",
+    "ts-node": "^10.9.1"
+  }
+}

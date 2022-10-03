@@ -1,0 +1,48 @@
+version: "3.7"
+
+services:
+  # tw-utils REST API
+  twutils_api:
+    image: node:16.11.1
+    container_name: twutils_api
+    volumes:
+      - ./tw-utils-api:/rest_api
+    working_dir: /rest_api
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+    - |
+      npm i
+      npm run serve
+    environment:
+      PORT: ${TW_UTILS_PORT}
+
+  # MongoDB
+  teedata_mongo:
+    image: mongo
+    container_name: teedata_mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    ports:
+      - 1234:27017
+    restart: always
+
+  # Discord bot
+  teedata_bot:
+    image: node:latest
+    container_name: teedata_bot
+    volumes:
+      - ./:/bot
+    working_dir: /bot
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+    - |
+      npm i
+      npm run build
+      npm run start
+    environment:
+      MONGO: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@teedata_mongo?authSource=admin
+    depends_on:
+      - teedata_mongo
+      - twutils_api
+    restart: always
