@@ -153,7 +153,6 @@ export default class implements ICommand {
     message: Message<boolean> | CommandInteraction<CacheType>,
     args: Array<CommandInteractionOption>
   ) {
-      // Get potential arguments
     const [ subCommand ] = args;
     const [ 
       skinId, sceneName
