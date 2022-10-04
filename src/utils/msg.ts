@@ -8,10 +8,15 @@ enum ErrorMessage {
 
 class ErrorEmbed {
   static wrong(details: string = ''): EmbedBuilder {
-    return new EmbedBuilder()
+    const embed = new EmbedBuilder()
       .setTitle(ErrorMessage.WRONG_ERROR_MSG)
-      .setDescription(details)
       .setColor(0x000000);
+
+    if (details) {
+      embed.setDescription(details);
+    }
+
+    return embed;
   }
 
   static notFound(): EmbedBuilder {

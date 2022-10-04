@@ -96,7 +96,9 @@ export default class implements ICommand {
     const results = await TwUtils.sceneList();
 
     if (results === null) {
-      await interaction.followUp({embeds: [ ErrorEmbed.wrong() ]});
+      await interaction.followUp({
+        embeds: [ ErrorEmbed.wrong() ]
+    });
       return;
     }
 
@@ -115,7 +117,8 @@ export default class implements ICommand {
     sceneName: string
   ) {
     const assetInfo = await Teedata.assetInfo(skinId);
-    const skinUrl = process.env.TEEDATA_HOST + (assetInfo.path || '');
+    const skinPath = assetInfo ? assetInfo.path : '';
+    const skinUrl = process.env.TEEDATA_HOST + skinPath;
     const sceneRawBytes =  await TwUtils.sceneRender(
       {
         skin: skinUrl,
@@ -124,7 +127,9 @@ export default class implements ICommand {
     );
 
     if (sceneRawBytes === null) {
-      await interaction.followUp({embeds: [ ErrorEmbed.wrong() ]});
+      await interaction.followUp({
+        embeds: [ ErrorEmbed.wrong('Unable to render the scene') ]
+    });
       return;
     }
     

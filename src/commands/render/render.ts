@@ -145,7 +145,9 @@ export default class implements ICommand {
     const info = await Teedata.assetInfo(skinId);
 
     if (info === null ) {
-      await interaction.followUp({embeds: [ ErrorEmbed.wrong() ]});
+      await interaction.followUp({
+        embeds: [ ErrorEmbed.wrong('Invalid skin id') ]
+      });
       return;
     }
 
@@ -174,7 +176,9 @@ export default class implements ICommand {
     }
 
     if (imageRawBytes === null ) {
-      await interaction.followUp({embeds: [ ErrorEmbed.wrong() ]});
+      await interaction.followUp({
+        embeds: [ ErrorEmbed.wrong('Invalid url') ]
+      });
       return;
     }
 
