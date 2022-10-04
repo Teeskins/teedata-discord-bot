@@ -1,6 +1,17 @@
-import axios, { AxiosRequestConfig,AxiosResponse } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 export type Response = Promise<any>;
+
+type UploadParams = {
+  name: string;
+  type: string;
+  author: string
+};
+
+type Params =
+  | UploadParams
+  | string
+  | null;
 
 class Teedata {
   private static readonly host: string = process.env.TEEDATA_HOST;
@@ -8,15 +19,19 @@ class Teedata {
   private static async commonRequest(
     route: string,
     param: string,
-    func: (url: string, config?: AxiosRequestConfig<any>) => Promise<AxiosResponse<any, any>>
+    func: (url: string, config?: AxiosRequestConfig<any>) => Promise<AxiosResponse<any, any>>,
+    data: Params = null
   ): Response {
     try {
       const req = await func(
         this.host + route + param,
         {
           headers: {
-            Accept: 'application/json',
+            'User-Agent': 'Mozilla/5.0',
+            Accept: 'application/json'
           },
+
+          data
         },
       );
 
@@ -62,8 +77,46 @@ class Teedata {
     );
   }
 
-  static async assetUpload(): Response {
+  static async assetUpload(data: UploadParams, file: Blob): Response {
+    const form = new FormData();
 
+    // form.append('file', file);
+    // form.append('name', data.name);
+    // form.append('author', data.author);
+    // form.append('type', data.type);
+
+    // const blob = 
+    // const nodeStream = Readable.from(blob.stream())
+  
+    try {
+      const req = await axios.post(
+        this.host + '/api/storeAsset/discord',
+        form,
+        {
+          headers: {
+            'User-Agent': 'Mozilla/5.0',
+            Accept: 'application/json',
+            'Content-Type': 'multipart/form-data'
+            // 'Content-Type': 'image/png'
+          },
+        },
+      );
+
+      if (req.status !== 200 || req.data.length === 0) {
+        return null;
+      }
+
+      return req.data;
+    } catch (error) {
+      console.log(error)
+      return null;
+    }
+    return await this.commonRequest(
+      '/api/storeAsset/discord/',
+      '',
+      axios.post,
+      data
+    );
   }
 
   static async isAssetDuplicate(hash: string): Promise<boolean> {

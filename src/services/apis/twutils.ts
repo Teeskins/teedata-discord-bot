@@ -21,12 +21,17 @@ type SceneRenderParams = {
   skin: string;
 };
 
+type Params = 
+  | RenderParams
+  | RenderColorParams
+  | SceneRenderParams;
+
 class TwUtils {
   private static readonly host: string = process.env.TW_UTILS_HOST + ':' + process.env.TW_UTILS_PORT;
 
   private static async commonRequest(
     route: string,
-    data: any,
+    data: Params,
     func: (url: string, config?: AxiosRequestConfig<any>) => Promise<AxiosResponse<any, any>>,
     responseType: ResponseType = 'json'
   ): Response {

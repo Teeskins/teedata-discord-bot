@@ -11,8 +11,9 @@ import {
 import { Bot } from '../../bot';
 import ICommand from '../../interfaces/command';
 import Teedata from '../../services/apis/teedata';
+import downloadAsset from '../../utils/downloadAsset';
 import ErrorEmbed from '../../utils/msg';
-  
+    
 export default class implements ICommand {
   name: String;
   category: String;
@@ -20,10 +21,17 @@ export default class implements ICommand {
   options: ApplicationCommandOption[];
   
   constructor() {
-    this.name = 'random';
+    this.name = 'upload';
     this.category = 'asset';
-    this.description = 'Random asset of a category';
+    this.description = 'Upload an asset';
     this.options = [
+      {
+        name: 'name',
+        type: ApplicationCommandOptionType.String,
+        required: true,
+        description: 'The asset name',
+        maxLength: 255
+      },
       {
         name: 'category',
         type: ApplicationCommandOptionType.String,
@@ -67,7 +75,20 @@ export default class implements ICommand {
             value: 'gridTemplate'
           },
         ]
-      }
+      },
+      {
+        name: 'author',
+        type: ApplicationCommandOptionType.String,
+        required: true,
+        description: 'The asset creator name',
+        maxLength: 255
+      },
+      {
+        name: 'image',
+        type: ApplicationCommandOptionType.Attachment,
+        required: true,
+        description: 'The asset to upload'
+      },
     ];
   }
   
@@ -76,35 +97,63 @@ export default class implements ICommand {
     message: Message<boolean> | CommandInteraction<CacheType>,
     args: Array<CommandInteractionOption>
   ) {
-    const [ categoryArg ] = args;
-    const category = categoryArg.value.toString();
-
+    const [ name, category, author, file ] = args;
+  
     const interaction = message as CommandInteraction<CacheType>;
     await interaction.deferReply();
+  
+    // Check if its a PNG
+    if (file.attachment.contentType !== 'image/png') {
+      await interaction.followUp({
+        embeds: [ ErrorEmbed.wrong('The content type must be `image/png`')]
+      })
+      return;
+    }
+  
+    // Download the attachment
+    const imageRawBytes = await downloadAsset(file.attachment.url);
 
-    const asset = await Teedata.assetRandom(category);
-
+    if (imageRawBytes === null) {
+      await interaction.followUp({
+        embeds: [ ErrorEmbed.wrong('Unable to upload this image')]
+      })
+      return;
+    }
+  
+    // Upload the file to the server
+    const blob = new Blob([imageRawBytes], { type: 'image/png '});
+    const asset = await Teedata.assetUpload(
+      {
+        name: name.value.toString(),
+        type: category.value.toString(),
+        author: author.value.toString()
+      },
+      blob
+    );
+  
     if (asset === null) {
       await interaction.followUp({
         embeds: [ ErrorEmbed.wrong() ]
       })
       return;
     }
-
-    const assetUrl = process.env.TEEDATA_HOST + asset.path;
-
+  
     const embed = new EmbedBuilder()
-      .setTitle(asset.name)
-      .setURL(assetUrl)
-      .setImage(assetUrl)
-      .setAuthor({
-        name: asset.uploaded_by.name,
-        iconURL: asset.uploaded_by.profile_photo_url
-      })
-      .setColor(0x000000);
-
+      .setColor(0x000000)
+      .setFields([
+        { name: 'Name', value: name.value.toString(), inline: true},
+        { name: 'Category', value: category.value.toString(), inline: true }
+      ])
+      .setAuthor(
+        {
+          name: '❤️ ' + interaction.member.user.username,
+          iconURL: interaction.user.avatarURL()
+        }
+      );
+          
     await interaction.followUp({
       embeds: [ embed ]
-    })
+    });
   };
 }
+  
