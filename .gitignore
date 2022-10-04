@@ -54,3 +54,5 @@ package-lock.json
 
 # Personal script
 run.sh
+
+test.ts
