@@ -3,8 +3,9 @@ import {
   readdirSync,
   writeFileSync,
   PathOrFileDescriptor,
-  appendFileSync
-
+  appendFileSync,
+  unlinkSync,
+  PathLike
 } from 'fs';
 
 import { join } from 'path';
@@ -40,8 +41,12 @@ const files = {
     );
   },
 
-  write: function (path: PathOrFileDescriptor, data: string) {
+  write: function (path: PathOrFileDescriptor, data: string | Uint8Array) {
     writeFileSync(path, data);
+  },
+
+  delete: function(path: PathLike) {
+    unlinkSync(path);
   },
 
   append(path: PathOrFileDescriptor, data: string) {

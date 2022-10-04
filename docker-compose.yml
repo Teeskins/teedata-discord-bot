@@ -1,6 +1,7 @@
 version: "3.7"
 
 services:
+
   # tw-utils REST API
   twutils_api:
     image: node:16.11.1
@@ -23,17 +24,15 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-    ports:
-      - 1234:27017
     restart: always
 
   # Discord bot
   teedata_bot:
     image: node:latest
     container_name: teedata_bot
+    working_dir: /bot
     volumes:
       - ./:/bot
-    working_dir: /bot
     entrypoint: ["/bin/sh", "-c"]
     command:
     - |
@@ -42,6 +41,8 @@ services:
       npm run start
     environment:
       MONGO: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@teedata_mongo?authSource=admin
+      TW_UTILS_HOST: http://twutils_api
+      TW_UTILS_PORT: ${TW_UTILS_PORT}
     depends_on:
       - teedata_mongo
       - twutils_api

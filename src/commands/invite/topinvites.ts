@@ -112,7 +112,7 @@ export default class implements ICommand {
   options: ApplicationCommandOption[];
 
   constructor() {
-    this.name = 'top';
+    this.name = 'topinvites';
     this.category = 'invite';
     this.description = 'Show top 20 inviters';
     this.options = [];
