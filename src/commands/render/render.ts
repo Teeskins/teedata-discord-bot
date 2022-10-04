@@ -133,70 +133,69 @@ export default class implements ICommand {
     message: Message<boolean> | CommandInteraction<CacheType>,
     args: Array<CommandInteractionOption>
   ) {
-      // Get potential arguments
-      const [ subCommand ] = args;
-      const [ 
-        skinId, colorMode, bodyColor, feetColor, eyes
-      ] = subCommand.options.map(option => option.value.toString());
+    // Get potential arguments
+    const [ subCommand ] = args;
+    const [ 
+      skinId, colorMode, bodyColor, feetColor, eyes
+    ] = subCommand.options.map(option => option.value.toString());
 
-      const interaction = message as CommandInteraction<CacheType>;
-      await interaction.deferReply();
+    const interaction = message as CommandInteraction<CacheType>;
+    await interaction.deferReply();
 
-      // Get skins info
-      const info = await Teedata.assetInfo(skinId);
+    // Get skins info
+    const info = await Teedata.assetInfo(skinId);
 
-      if (info === null ) {
-        await interaction.followUp({embeds: [ ErrorEmbed.wrong() ]});
-        return;
-      }
+    if (info === null ) {
+      await interaction.followUp({embeds: [ ErrorEmbed.wrong() ]});
+      return;
+    }
 
-      const skinUrl = process.env.TEEDATA_HOST + info.path;
+    const skinUrl = process.env.TEEDATA_HOST + info.path;
 
-      // Raw bytes PNG
-      let imageRawBytes: Uint8Array | null;
+    // Raw bytes PNG
+    let imageRawBytes: Uint8Array | null;
   
-      if (subCommand.name === 'custom') {
-        imageRawBytes = await TwUtils.renderSkinColor(
-          {
-            skin: skinUrl,
-            eye: eyes || 'default_eye',
-            bcolor: bodyColor,
-            fcolor: feetColor,
-            mode: colorMode
-          }
-        );
-      } else {
-        imageRawBytes = await TwUtils.renderSkin(
-          {
-            skin: skinUrl,
-            eye: eyes || 'default_eye'
-          }
-        );
-      }
-
-      if (imageRawBytes === null ) {
-        await interaction.followUp({embeds: [ ErrorEmbed.wrong() ]});
-        return;
-      }
-
-      // Generate a random temporary path
-      const path = uuidv4() + '.png';
-
-      files.write(path, imageRawBytes);
-
-      const file = new AttachmentBuilder(path);
-      const embed = new EmbedBuilder()
-        .setTitle(info.name)
-        .setURL(skinUrl)
-        .setImage('attachment://' + path)
-        .setColor(0x000000);
-
-      await interaction.followUp(
+    if (subCommand.name === 'custom') {
+      imageRawBytes = await TwUtils.renderSkinColor(
         {
-          embeds: [ embed ],
-          files: [ file ]
+          skin: skinUrl,
+          eye: eyes || 'default_eye',
+          bcolor: bodyColor,
+          fcolor: feetColor,
+          mode: colorMode
         }
       );
+    } else {
+      imageRawBytes = await TwUtils.renderSkin(
+        {
+          skin: skinUrl,
+          eye: eyes || 'default_eye'
+        }
+      );
+    }
+
+    if (imageRawBytes === null ) {
+      await interaction.followUp({embeds: [ ErrorEmbed.wrong() ]});
+      return;
+    }
+
+    const path = uuidv4() + '.png';
+
+    files.write(path, imageRawBytes);
+
+    const file = new AttachmentBuilder(path);
+    const embed = new EmbedBuilder()
+      .setTitle(info.name)
+      .setURL(skinUrl)
+      .setImage('attachment://' + path)
+      .setColor(0x000000);
+
+    await interaction.followUp(
+      {
+        embeds: [ embed ],
+        files: [ file ]
+      }
+    );
 
     files.delete(path);
   };

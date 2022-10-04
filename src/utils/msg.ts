@@ -3,7 +3,7 @@ import { EmbedBuilder } from "discord.js";
 enum ErrorMessage {
   WRONG_ERROR_MSG = '⚠️ Something went wrong',
   NOT_FOUND_ERROR_MSG = '☁️ Nothing has not been found',
-  MISSING_PERMISSION = '⚠️ You need permission to run this command',
+  MISSING_PERMISSION = '⛔️ You need permission to run this command',
 }
 
 class ErrorEmbed {

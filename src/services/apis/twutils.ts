@@ -16,6 +16,11 @@ type RenderColorParams = {
   mode: string;
 };
 
+type SceneRenderParams = {
+  name: string;
+  skin: string;
+};
+
 class TwUtils {
   private static readonly host: string = process.env.TW_UTILS_HOST + ':' + process.env.TW_UTILS_PORT;
 
@@ -60,6 +65,24 @@ class TwUtils {
   static async renderSkinColor(data: RenderColorParams): BufferResponse {
     return await this.commonRequest(
       '/renderColor',
+      data,
+      axios.get,
+      'arraybuffer'
+    );
+  }
+
+  static async sceneList(): Response {
+    return await this.commonRequest(
+      '/sceneList',
+      null,
+      axios.get,
+      'json'
+    );
+  }
+
+  static async sceneRender(data: SceneRenderParams): BufferResponse {
+    return await this.commonRequest(
+      '/scene',
       data,
       axios.get,
       'arraybuffer'

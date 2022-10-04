@@ -8,18 +8,23 @@ import {
   CommandInteraction,
   CacheType
 } from 'discord.js';
-import IPageComponent from '../../interfaces/pageComponent';
 
+import { v4 as uuidv4 } from 'uuid';
+
+import IPageComponent from '../../interfaces/pageComponent';
 import Page from '../../utils/page';
 
 abstract class AbstractPageComponent<T> extends Page<T> implements IPageComponent {
   protected message: CommandInteraction<CacheType>;
 
-  protected previousId: string = 'previous';
-  protected nextId: string = 'next';
+  protected previousId: string;
+  protected nextId: string;
 
   constructor(maxLines: number = 10) {
     super(maxLines);
+
+    this.previousId = uuidv4();
+    this.nextId = uuidv4();
   }
 
   setMessage(message: CommandInteraction<CacheType>): this {
@@ -74,6 +79,10 @@ abstract class AbstractPageComponent<T> extends Page<T> implements IPageComponen
         return;
       }
 
+      if (i.customId !== this.nextId && i.customId !== this.previousId) {
+        return;
+      }
+
       switch (i.customId) {
         case this.previousId:
           this.previous()
@@ -85,11 +94,7 @@ abstract class AbstractPageComponent<T> extends Page<T> implements IPageComponen
           break;
       }
 
-      try {
-        await i.deferUpdate();
-      } catch (e) {
-        // Log if error
-      }
+      await i.deferUpdate();
       await i.editReply(this.createOptions());
       
     });

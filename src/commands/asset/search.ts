@@ -93,31 +93,31 @@ export default class implements ICommand {
     message: Message<boolean> | CommandInteraction<CacheType>,
     args: Array<CommandInteractionOption>
   ) {
-      const [ keyword ] = args.map(x => x.value.toString());
-      const interaction = message as CommandInteraction<CacheType>;
+    const [ keyword ] = args.map(x => x.value.toString());
+    const interaction = message as CommandInteraction<CacheType>;
 
-      await interaction.deferReply();
+    await interaction.deferReply();
 
-      const searchResult = await Teedata.assetSearch(keyword);
+    const searchResult = await Teedata.assetSearch(keyword);
 
-      if (searchResult === null) {
-        await interaction.followUp({ embeds: [ ErrorEmbed.notFound() ]});
-        return;
-      }
+    if (searchResult === null) {
+      await interaction.followUp({ embeds: [ ErrorEmbed.notFound() ]});
+      return;
+    }
 
-      const results = searchResult.map((result: SearchResult) => {
-          return {
-            id: '**' + result.id + '**',
-            name: result.name,
-            type: result.type
-          };
-      });
+    const results = searchResult.map((result: SearchResult) => {
+        return {
+          id: '**' + result.id + '**',
+          name: result.name,
+          type: result.type
+        };
+    });
 
-      const component = new SearchPageComponent(keyword)
-        .setMaxLines(10)
-        .setMessage(interaction)
-        .addContent(results);
-    
+    const component = new SearchPageComponent(keyword)
+      .setMaxLines(10)
+      .setMessage(interaction)
+      .addContent(results);
+  
     await component.collect();
     await component.reply();
   };
