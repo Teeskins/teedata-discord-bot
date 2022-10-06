@@ -13,7 +13,8 @@ services:
     command:
     - |
       npm i
-      npm run serve
+      npm run build
+      npm run start
     environment:
       PORT: ${TW_UTILS_PORT}
 

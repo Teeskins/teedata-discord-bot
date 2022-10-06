@@ -16,14 +16,19 @@ type RenderColorParams = {
   mode: string;
 };
 
-type SceneRenderParams = {
+type SceneRenderWithSkinParams = {
   name: string;
   skin: string;
+};
+
+type SceneRenderParams = {
+  name: string;
 };
 
 type Params = 
   | RenderParams
   | RenderColorParams
+  | SceneRenderWithSkinParams
   | SceneRenderParams;
 
 class TwUtils {
@@ -85,9 +90,18 @@ class TwUtils {
     );
   }
 
-  static async sceneRender(data: SceneRenderParams): BufferResponse {
+  static async sceneRenderWithSkin(data: SceneRenderWithSkinParams): BufferResponse {
     return await this.commonRequest(
       '/scene',
+      data,
+      axios.get,
+      'arraybuffer'
+    );
+  }
+
+  static async sceneRender(data: SceneRenderParams): BufferResponse {
+    return await this.commonRequest(
+      '/sceneOnly',
       data,
       axios.get,
       'arraybuffer'

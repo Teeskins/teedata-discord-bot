@@ -19,7 +19,7 @@ class Teedata {
   private static async commonRequest(
     route: string,
     param: string,
-    func: (url: string, config?: AxiosRequestConfig<any>) => Promise<AxiosResponse<any, any>>,
+    func: any,
     data: Params = null
   ): Response {
     try {

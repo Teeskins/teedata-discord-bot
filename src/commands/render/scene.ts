@@ -5,8 +5,7 @@ import {
   CommandInteraction,
   CommandInteractionOption,
   Message,
-  EmbedBuilder,
-  AttachmentBuilder
+  EmbedBuilder
 } from 'discord.js';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -18,8 +17,8 @@ import Teedata from '../../services/apis/teedata';
 import TwUtils from '../../services/apis/twutils';
 import ErrorEmbed from '../../utils/msg';
 
-import { files } from '../../utils/files';
 import AbstractPageComponent from '../../services/components/page';
+import sendDiscordRawImage from '../../utils/discordSendImage';
 
 type Scenes = string[];
 
@@ -60,16 +59,25 @@ export default class implements ICommand {
     this.description = 'Managing Teeworlds skins in scene rendering';
     this.options = [
       {
+        name: 'view',
+        description: 'View a scene',
+        type: ApplicationCommandOptionType.Subcommand,
+        options: [
+          {
+            name: 'name',
+            type: ApplicationCommandOptionType.String,
+            description: 'The scene name',
+            required: true,
+            choices: [
+            ]
+          }
+        ]
+      },
+      {
         name: 'render',
         description: 'Render a Teeworlds skin in a scene (default skin colors)',
         type: ApplicationCommandOptionType.Subcommand,
         options: [
-          {
-            name: 'id',
-            type: ApplicationCommandOptionType.String,
-            required: true,
-            description: 'The skin id',
-          },
           {
             name: 'scene',
             type: ApplicationCommandOptionType.String,
@@ -77,6 +85,12 @@ export default class implements ICommand {
             required: true,
             choices: [
             ]
+          },
+          {
+            name: 'id',
+            type: ApplicationCommandOptionType.String,
+            required: true,
+            description: 'The skin id',
           }
         ]
       },
@@ -111,15 +125,52 @@ export default class implements ICommand {
     await component.reply();
   }
 
+  private async sceneViewCommand(
+    interaction: CommandInteraction<CacheType>,
+    sceneName: string
+  ) {
+    const sceneRawBytes =  await TwUtils.sceneRender(
+      {
+        name: sceneName
+      }
+    );
+
+    if (sceneRawBytes === null) {
+      await interaction.followUp({
+        embeds: [ ErrorEmbed.wrong('Unable to view the scene') ]
+      });
+      return;
+    }
+    
+    const path = uuidv4() + '.png';
+
+    await sendDiscordRawImage(
+      interaction,
+      {
+        title: sceneName,
+        raw: sceneRawBytes,
+        path
+      }
+    );
+  }
+
   private async sceneRenderCommand(
     interaction: CommandInteraction<CacheType>,
     skinId: string,
     sceneName: string
   ) {
     const assetInfo = await Teedata.assetInfo(skinId);
+
+    if (assetInfo === null) {
+      await interaction.followUp({
+        embeds: [ ErrorEmbed.wrong('Unable asset informations') ]
+    });
+      return;
+    }
+
     const skinPath = assetInfo ? assetInfo.path : '';
     const skinUrl = process.env.TEEDATA_HOST + skinPath;
-    const sceneRawBytes =  await TwUtils.sceneRender(
+    const sceneRawBytes =  await TwUtils.sceneRenderWithSkin(
       {
         skin: skinUrl,
         name: sceneName
@@ -135,22 +186,14 @@ export default class implements ICommand {
     
     const path = uuidv4() + '.png';
 
-    files.write(path, sceneRawBytes);
-
-    const file = new AttachmentBuilder(path);
-    const embed = new EmbedBuilder()
-      .setTitle(sceneName)
-      .setImage('attachment://' + path)
-      .setColor(0x000000);
-
-    await interaction.followUp(
+    await sendDiscordRawImage(
+      interaction,
       {
-        embeds: [ embed ],
-        files: [ file ]
+        title: sceneName,
+        raw: sceneRawBytes,
+        path
       }
     );
-
-    files.delete(path);
   }
 
   async run(
@@ -160,7 +203,7 @@ export default class implements ICommand {
   ) {
     const [ subCommand ] = args;
     const [ 
-      skinId, sceneName
+      sceneName, skinId
     ] = subCommand.options.map(option => option.value.toString());
   
     const interaction = message as CommandInteraction<CacheType>;
@@ -169,13 +212,20 @@ export default class implements ICommand {
 
     switch (subCommand.name) {
       case 'list':
-        this.sceneListCommand(interaction);
+        await this.sceneListCommand(interaction);
         break;
   
       case 'render':
-        this.sceneRenderCommand(
+        await this.sceneRenderCommand(
           interaction,
           skinId,
+          sceneName
+        );
+        break;
+      
+      case 'view':
+        await this.sceneViewCommand(
+          interaction,
           sceneName
         );
         break;

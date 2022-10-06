@@ -7,7 +7,6 @@ import {
   Message
 } from 'discord.js';
 
-
 import { Bot } from '../../bot';
 import ICommand from '../../interfaces/command';
 
