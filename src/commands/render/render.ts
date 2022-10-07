@@ -139,21 +139,14 @@ export default class implements ICommand {
     ] = subCommand.options.map(option => option.value.toString());
 
     const interaction = message as CommandInteraction<CacheType>;
-    await interaction.deferReply();
+    await interaction.deferReply({ ephemeral: true });
 
     // Get skins info
     const info = await Teedata.assetInfo(skinId);
 
-    if (info === null ) {
+    if (info === null || info.type !== 'skin') {
       await interaction.followUp({
-        embeds: [ ErrorEmbed.wrong('Invalid skin id') ]
-      });
-      return;
-    }
-
-    if (info.type !== 'skin') {
-      await interaction.followUp({
-        embeds: [ ErrorEmbed.wrong('This asset is not a skin') ]
+        embeds: [ ErrorEmbed.wrong('This is not a skin id') ]
       });
       return;
     }

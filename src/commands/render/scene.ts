@@ -161,17 +161,10 @@ export default class implements ICommand {
   ) {
     const assetInfo = await Teedata.assetInfo(skinId);
 
-    if (assetInfo === null) {
+    if (assetInfo === null || assetInfo.type !== 'skin') {
       await interaction.followUp({
-        embeds: [ ErrorEmbed.wrong('Unable asset informations') ]
+        embeds: [ ErrorEmbed.wrong('Unable to get informations or this asset is not a skin') ]
     });
-      return;
-    }
-
-    if (assetInfo.type !== 'skin') {
-      await interaction.followUp({
-        embeds: [ ErrorEmbed.wrong('This asset is not a skin') ]
-      });
       return;
     }
 
@@ -215,7 +208,7 @@ export default class implements ICommand {
   
     const interaction = message as CommandInteraction<CacheType>;
 
-    await interaction.deferReply();
+    await interaction.deferReply({ ephemeral: true });
 
     switch (subCommand.name) {
       case 'list':

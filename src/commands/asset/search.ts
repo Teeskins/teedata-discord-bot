@@ -96,7 +96,7 @@ export default class implements ICommand {
     const [ keyword ] = args.map(x => x.value.toString());
     const interaction = message as CommandInteraction<CacheType>;
 
-    await interaction.deferReply();
+    await interaction.deferReply({ ephemeral: true });
 
     const searchResult = await Teedata.assetSearch(keyword);
 

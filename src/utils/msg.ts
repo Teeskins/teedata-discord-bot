@@ -13,7 +13,7 @@ class ErrorEmbed {
       .setColor(0x000000);
 
     if (details) {
-      embed.setDescription(details);
+      embed.setDescription('**Hint**: ' + details);
     }
 
     return embed;

@@ -80,7 +80,7 @@ export default class implements ICommand {
     const category = categoryArg.value.toString();
 
     const interaction = message as CommandInteraction<CacheType>;
-    await interaction.deferReply();
+    await interaction.deferReply({ ephemeral: true });
 
     const asset = await Teedata.assetRandom(category);
 

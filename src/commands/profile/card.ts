@@ -146,7 +146,7 @@ export default class implements ICommand {
 
     const interaction = message as CommandInteraction<CacheType>;
 
-    await interaction.deferReply();
+    await interaction.deferReply({ ephemeral: true });
 
     switch (subCommand.name) {
       case 'essential':
