@@ -151,6 +151,13 @@ export default class implements ICommand {
       return;
     }
 
+    if (info.type !== 'skin') {
+      await interaction.followUp({
+        embeds: [ ErrorEmbed.wrong('This asset is not a skin') ]
+      });
+      return;
+    }
+
     const skinUrl = process.env.TEEDATA_HOST + info.path;
 
     // Raw bytes PNG

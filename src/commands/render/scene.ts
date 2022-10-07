@@ -168,6 +168,13 @@ export default class implements ICommand {
       return;
     }
 
+    if (assetInfo.type !== 'skin') {
+      await interaction.followUp({
+        embeds: [ ErrorEmbed.wrong('This asset is not a skin') ]
+      });
+      return;
+    }
+
     const skinPath = assetInfo ? assetInfo.path : '';
     const skinUrl = process.env.TEEDATA_HOST + skinPath;
     const sceneRawBytes =  await TwUtils.sceneRenderWithSkin(

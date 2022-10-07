@@ -25,11 +25,20 @@ type SceneRenderParams = {
   name: string;
 };
 
+export type personalCardParams = {
+  username?: string,
+  clan?: string,
+  gamemode?: string,
+  since?: string,
+  description?: string,
+}
+
 type Params = 
   | RenderParams
   | RenderColorParams
   | SceneRenderWithSkinParams
-  | SceneRenderParams;
+  | SceneRenderParams
+  | personalCardParams;
 
 class TwUtils {
   private static readonly host: string = process.env.TW_UTILS_HOST + ':' + process.env.TW_UTILS_PORT;
@@ -102,6 +111,15 @@ class TwUtils {
   static async sceneRender(data: SceneRenderParams): BufferResponse {
     return await this.commonRequest(
       '/sceneOnly',
+      data,
+      axios.get,
+      'arraybuffer'
+    );
+  }
+
+  static async personalCard(data: personalCardParams): BufferResponse {
+    return await this.commonRequest(
+      '/personalCard',
       data,
       axios.get,
       'arraybuffer'
