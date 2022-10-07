@@ -10,7 +10,7 @@ import ICommand, { isICommand } from './interfaces/command';
 
 import { files } from './utils/files';
 
-// import database from "./services/database/database";
+import database from "./services/database/database";
 
 class Bot extends Client {
   private commandsDir: string = 'commands/';
@@ -22,7 +22,7 @@ class Bot extends Client {
   constructor(options: ClientOptions) {
     super(options);
     // Connecting to the database
-    // database.createConnection();
+    database.createConnection();
 
     // Loading commands and events
     this.loadCommands();

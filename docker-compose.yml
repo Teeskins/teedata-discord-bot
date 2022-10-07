@@ -19,13 +19,13 @@ services:
       PORT: ${TW_UTILS_PORT}
 
   # MongoDB
-  # teedata_mongo:
-  #   image: mongo
-  #   container_name: teedata_mongo
-  #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-  #     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-  #   restart: always
+  teedata_mongo:
+    image: mongo
+    container_name: teedata_mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    restart: always
 
   # Discord bot
   teedata_bot:
