@@ -45,6 +45,6 @@ services:
       TW_UTILS_HOST: http://twutils_api
       TW_UTILS_PORT: ${TW_UTILS_PORT}
     depends_on:
-      # - teedata_mongo
+      - teedata_mongo
       - twutils_api
     restart: always

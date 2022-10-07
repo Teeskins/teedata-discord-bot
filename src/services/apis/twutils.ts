@@ -26,19 +26,25 @@ type SceneRenderParams = {
 };
 
 export type personalCardParams = {
-  username?: string,
-  clan?: string,
-  gamemode?: string,
-  since?: string,
-  description?: string,
-}
+  username?: string;
+  clan?: string;
+  gamemode?: string;
+  since?: string;
+  description?: string;
+};
+
+type FixAssetParams = {
+  category: string;
+  path: string;
+};
 
 type Params = 
   | RenderParams
   | RenderColorParams
   | SceneRenderWithSkinParams
   | SceneRenderParams
-  | personalCardParams;
+  | personalCardParams
+  | FixAssetParams;
 
 class TwUtils {
   private static readonly host: string = process.env.TW_UTILS_HOST + ':' + process.env.TW_UTILS_PORT;
@@ -120,6 +126,15 @@ class TwUtils {
   static async personalCard(data: personalCardParams): BufferResponse {
     return await this.commonRequest(
       '/personalCard',
+      data,
+      axios.get,
+      'arraybuffer'
+    );
+  }
+
+  static async fixAsset(data: FixAssetParams): BufferResponse {
+    return await this.commonRequest(
+      '/assetFix',
       data,
       axios.get,
       'arraybuffer'

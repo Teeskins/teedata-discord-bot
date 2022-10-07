@@ -13,6 +13,7 @@ import ICommand from '../../interfaces/command';
 import Teedata from '../../services/apis/teedata';
 import downloadAsset from '../../utils/downloadAsset';
 import ErrorEmbed from '../../utils/msg';
+import teedataCategories from '../../utils/teedataCategories';
     
 export default class implements ICommand {
   name: String;
@@ -37,44 +38,7 @@ export default class implements ICommand {
         type: ApplicationCommandOptionType.String,
         required: true,
         description: 'The asset category',
-        choices: [
-          {
-            name: 'skin',
-            value: 'skin'
-          },
-          {
-            name: 'mapres',
-            value: 'mapres'
-          },
-          {
-            name: 'gameskin',
-            value: 'gameskin'
-          },
-          {
-            name: 'emoticon',
-            value: 'emoticon'
-          },
-          {
-            name: 'entity',
-            value: 'entity'
-          },
-          {
-            name: 'cursor',
-            value: 'cursor'
-          },
-          {
-            name: 'particle',
-            value: 'particle'
-          },
-          {
-            name: 'font',
-            value: 'font'
-          },
-          {
-            name: 'gridTemplate',
-            value: 'gridTemplate'
-          },
-        ]
+        choices: teedataCategories
       },
       {
         name: 'author',
@@ -100,7 +64,7 @@ export default class implements ICommand {
     const [ name, category, author, file ] = args;
   
     const interaction = message as CommandInteraction<CacheType>;
-    await interaction.deferReply();
+    await interaction.deferReply({ ephemeral: true });
   
     // Check if its a PNG
     if (file.attachment.contentType !== 'image/png') {
@@ -109,26 +73,28 @@ export default class implements ICommand {
       })
       return;
     }
+
+    console.log(file)
   
     // Download the attachment
-    const imageRawBytes = await downloadAsset(file.attachment.url);
+    // const imageRawBytes = await downloadAsset(file.attachment.url);
 
-    if (imageRawBytes === null) {
-      await interaction.followUp({
-        embeds: [ ErrorEmbed.wrong('Unable to upload this image')]
-      })
-      return;
-    }
+    // if (imageRawBytes === null) {
+    //   await interaction.followUp({
+    //     embeds: [ ErrorEmbed.wrong('Unable to upload this image')]
+    //   })
+    //   return;
+    // }
   
     // Upload the file to the server
-    const blob = new Blob([imageRawBytes], { type: 'image/png '});
+    // const blob = new Blob([imageRawBytes], { type: 'image/png '});
     const asset = await Teedata.assetUpload(
       {
         name: name.value.toString(),
         type: category.value.toString(),
-        author: author.value.toString()
+        author: author.value.toString(),
+        url: file.attachment.url
       },
-      blob
     );
   
     if (asset === null) {

@@ -5,7 +5,8 @@ export type Response = Promise<any>;
 type UploadParams = {
   name: string;
   type: string;
-  author: string
+  author: string;
+  url: string;
 };
 
 type Params =
@@ -77,8 +78,8 @@ class Teedata {
     );
   }
 
-  static async assetUpload(data: UploadParams, file: Blob): Response {
-    const form = new FormData();
+  static async assetUpload(data: UploadParams): Response {
+    // const form = new FormData();
 
     // form.append('file', file);
     // form.append('name', data.name);
@@ -90,15 +91,13 @@ class Teedata {
   
     try {
       const req = await axios.post(
-        this.host + '/api/storeAsset/discord',
-        form,
+        'https://api-staging.skins.tw/api/storeAsset/discord',
         {
           headers: {
             'User-Agent': 'Mozilla/5.0',
             Accept: 'application/json',
-            'Content-Type': 'multipart/form-data'
-            // 'Content-Type': 'image/png'
           },
+          data
         },
       );
 
@@ -111,12 +110,12 @@ class Teedata {
       console.log(error)
       return null;
     }
-    return await this.commonRequest(
-      '/api/storeAsset/discord/',
-      '',
-      axios.post,
-      data
-    );
+    // return await this.commonRequest(
+    //   '/api/storeAsset/discord/',
+    //   '',
+    //   axios.post,
+    //   data
+    // );
   }
 
   static async isAssetDuplicate(hash: string): Promise<boolean> {

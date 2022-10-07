@@ -12,6 +12,7 @@ import { Bot } from '../../bot';
 import ICommand from '../../interfaces/command';
 import Teedata from '../../services/apis/teedata';
 import ErrorEmbed from '../../utils/msg';
+import teedataCategories from '../../utils/teedataCategories';
   
 export default class implements ICommand {
   name: String;
@@ -29,44 +30,7 @@ export default class implements ICommand {
         type: ApplicationCommandOptionType.String,
         required: true,
         description: 'The asset category',
-        choices: [
-          {
-            name: 'skin',
-            value: 'skin'
-          },
-          {
-            name: 'mapres',
-            value: 'mapres'
-          },
-          {
-            name: 'gameskin',
-            value: 'gameskin'
-          },
-          {
-            name: 'emoticon',
-            value: 'emoticon'
-          },
-          {
-            name: 'entity',
-            value: 'entity'
-          },
-          {
-            name: 'cursor',
-            value: 'cursor'
-          },
-          {
-            name: 'particle',
-            value: 'particle'
-          },
-          {
-            name: 'font',
-            value: 'font'
-          },
-          {
-            name: 'gridTemplate',
-            value: 'gridTemplate'
-          },
-        ]
+        choices: teedataCategories
       }
     ];
   }
