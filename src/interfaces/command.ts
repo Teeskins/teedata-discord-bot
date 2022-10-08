@@ -9,12 +9,13 @@ import { Bot } from '../bot';
 import { hasImplemented } from '../utils/implemented';
 
 export default interface ICommand {
-  name: String,
-  category: String,
-  description: String,
-  args?: string,
-  aliases?: Array<string>,
-  options: ApplicationCommandOption[],
+  name: string;
+  category: string;
+  description: string;
+  extraDescription?: string;
+  args?: string;
+  aliases?: Array<string>;
+  options: ApplicationCommandOption[];
   run: (
     bot: Bot,
     message: Message | CommandInteraction,

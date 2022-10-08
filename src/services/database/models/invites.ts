@@ -9,10 +9,10 @@ interface IInvite extends Document {
 
 const inviteSchema = new Schema<IInvite>(
   {
-    guild_id: { type: String, required: true, index: true },
-    user_id: { type: String, required: true, index: true },
+    guild_id: { type: string, required: true, index: true },
+    user_id: { type: string, required: true, index: true },
     invites: { type: Number, required: true, default: 0 },
-    invited_by: { type: String, required: false },
+    invited_by: { type: string, required: false },
   }
 );
 

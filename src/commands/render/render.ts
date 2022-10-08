@@ -54,15 +54,17 @@ const eyesArgument: any = {
 };
 
 export default class implements ICommand {
-  name: String;
-  category: String;
-  description: String;
+  name: string;
+  category: string;
+  description: string;
+  extraDescription: string;
   options: ApplicationCommandOption[];
     
   constructor() {
     this.name = 'render';
     this.category = 'render';
     this.description = 'Render a Teeworlds skin';
+    this.extraDescription = 'Color modes formats'
     this.options = [
       {
         name: 'custom',
@@ -178,7 +180,7 @@ export default class implements ICommand {
 
     if (imageRawBytes === null ) {
       await interaction.followUp({
-        embeds: [ ErrorEmbed.wrong('Invalid url') ]
+        embeds: [ ErrorEmbed.wrong('Invalid color, check `/help render`') ]
       });
       return;
     }

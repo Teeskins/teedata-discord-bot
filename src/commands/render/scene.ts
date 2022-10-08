@@ -5,7 +5,8 @@ import {
   CommandInteraction,
   CommandInteractionOption,
   Message,
-  EmbedBuilder
+  EmbedBuilder,
+  ApplicationCommandOptionChoiceData
 } from 'discord.js';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -48,9 +49,9 @@ extends AbstractPageComponent<Scenes> {
 }
 
 export default class implements ICommand {
-  name: String;
-  category: String;
-  description: String;
+  name: string;
+  category: string;
+  description: string;
   options: ApplicationCommandOption[];
     
   constructor() {
@@ -59,49 +60,68 @@ export default class implements ICommand {
     this.description = 'Managing Teeworlds skins in scene rendering';
     this.options = [
       {
-        name: 'view',
-        description: 'View a scene',
-        type: ApplicationCommandOptionType.Subcommand,
-        options: [
-          {
-            name: 'name',
-            type: ApplicationCommandOptionType.String,
-            description: 'The scene name',
-            required: true,
-            choices: [
-            ]
-          }
-        ]
-      },
-      {
-        name: 'render',
-        description: 'Render a Teeworlds skin in a scene (default skin colors)',
-        type: ApplicationCommandOptionType.Subcommand,
-        options: [
-          {
-            name: 'scene',
-            type: ApplicationCommandOptionType.String,
-            description: 'The scene name',
-            required: true,
-            choices: [
-            ]
-          },
-          {
-            name: 'id',
-            type: ApplicationCommandOptionType.String,
-            required: true,
-            description: 'The skin id',
-          }
-        ]
-      },
-      {
         name: 'list',
         description: 'Get every available scene',
         type: ApplicationCommandOptionType.Subcommand,
-        options: [
-        ]
       }
     ];
+
+    this.sceneChoices().then(choices => {
+      this.options.push(
+        {
+          name: 'view',
+          description: 'View a scene',
+          type: ApplicationCommandOptionType.Subcommand,
+          options: [
+            {
+              name: 'name',
+              type: ApplicationCommandOptionType.String,
+              description: 'The scene name',
+              required: true,
+              choices
+            }
+          ]
+        }
+      );
+
+      this.options.push(
+        {
+          name: 'render',
+          description: 'Render a Teeworlds skin in a scene (default skin colors)',
+          type: ApplicationCommandOptionType.Subcommand,
+          options: [
+            {
+              name: 'scene',
+              type: ApplicationCommandOptionType.String,
+              description: 'The scene name',
+              required: true,
+              choices
+            },
+            {
+              name: 'id',
+              type: ApplicationCommandOptionType.String,
+              required: true,
+              description: 'The skin id',
+            }
+          ]
+        }
+      );
+    })
+  }
+
+  private async sceneChoices(): Promise<ApplicationCommandOptionChoiceData<string>[]> {
+    const sceneList = await TwUtils.sceneList();
+
+    if (sceneList === null) {
+      return [];
+    }
+
+    return sceneList.map((sceneName: string) => {
+      return {
+        name: sceneName,
+        value: sceneName
+      }
+    })
   }
 
   private async sceneListCommand(

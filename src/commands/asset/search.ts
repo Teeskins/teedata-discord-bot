@@ -67,9 +67,9 @@ extends AbstractPageComponent<SearchResult> {
 }
 
 export default class implements ICommand {
-  name: String;
-  category: String;
-  description: String;
+  name: string;
+  category: string;
+  description: string;
   options: ApplicationCommandOption[];
     
   constructor() {

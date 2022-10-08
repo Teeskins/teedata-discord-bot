@@ -13,8 +13,8 @@ import { files } from './utils/files';
 import database from "./services/database/database";
 
 class Bot extends Client {
-  private commandsDir: string = 'commands/';
-  private eventsDir: string = 'events/';
+  private readonly commandsDir: string = 'commands/';
+  private readonly eventsDir: string = 'events/';
 
   commands: Collection<string, ICommand> = new Collection();
   invites: Collection<string, Collection<string, number>> = new Collection();
