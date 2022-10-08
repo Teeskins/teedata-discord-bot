@@ -26,14 +26,13 @@ class Teedata {
     try {
       const req = await func(
         this.host + route + param,
+        data,
         {
           headers: {
             'User-Agent': 'Mozilla/5.0',
             Accept: 'application/json'
           },
-
-          data
-        },
+        }
       );
 
       if (req.status !== 200 || req.data.length === 0) {
@@ -79,25 +78,14 @@ class Teedata {
   }
 
   static async assetUpload(data: UploadParams): Response {
-    // const form = new FormData();
-
-    // form.append('file', file);
-    // form.append('name', data.name);
-    // form.append('author', data.author);
-    // form.append('type', data.type);
-
-    // const blob = 
-    // const nodeStream = Readable.from(blob.stream())
-  
     try {
       const req = await axios.post(
         'https://api-staging.skins.tw/api/storeAsset/discord',
+        data,
         {
           headers: {
-            'User-Agent': 'Mozilla/5.0',
             Accept: 'application/json',
-          },
-          data
+          }
         },
       );
 
@@ -107,15 +95,8 @@ class Teedata {
 
       return req.data;
     } catch (error) {
-      console.log(error)
       return null;
     }
-    // return await this.commonRequest(
-    //   '/api/storeAsset/discord/',
-    //   '',
-    //   axios.post,
-    //   data
-    // );
   }
 
   static async isAssetDuplicate(hash: string): Promise<boolean> {

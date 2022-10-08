@@ -83,7 +83,7 @@ export default class implements ICommand {
         required: true,
         description: 'The keyword to search inside the assets name',
         minLength: 3,
-        maxLength: 10
+        maxLength: 255
       }
     ];
   }

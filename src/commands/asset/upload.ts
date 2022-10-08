@@ -11,7 +11,6 @@ import {
 import { Bot } from '../../bot';
 import ICommand from '../../interfaces/command';
 import Teedata from '../../services/apis/teedata';
-import downloadAsset from '../../utils/downloadAsset';
 import ErrorEmbed from '../../utils/msg';
 import teedataCategories from '../../utils/teedataCategories';
     
@@ -65,7 +64,7 @@ export default class implements ICommand {
   
     const interaction = message as CommandInteraction<CacheType>;
     await interaction.deferReply({ ephemeral: true });
-  
+
     // Check if its a PNG
     if (file.attachment.contentType !== 'image/png') {
       await interaction.followUp({
@@ -74,8 +73,6 @@ export default class implements ICommand {
       return;
     }
 
-    console.log(file)
-  
     // Download the attachment
     // const imageRawBytes = await downloadAsset(file.attachment.url);
 
@@ -87,7 +84,6 @@ export default class implements ICommand {
     // }
   
     // Upload the file to the server
-    // const blob = new Blob([imageRawBytes], { type: 'image/png '});
     const asset = await Teedata.assetUpload(
       {
         name: name.value.toString(),
@@ -106,16 +102,12 @@ export default class implements ICommand {
   
     const embed = new EmbedBuilder()
       .setColor(0x000000)
+      .setTitle('❤️ Thanks you for uploading to Teedata')
       .setFields([
         { name: 'Name', value: name.value.toString(), inline: true},
-        { name: 'Category', value: category.value.toString(), inline: true }
+        { name: 'Category', value: category.value.toString(), inline: true },
+        { name: 'Author', value: author.value.toString(), inline: true }
       ])
-      .setAuthor(
-        {
-          name: '❤️ ' + interaction.member.user.username,
-          iconURL: interaction.user.avatarURL()
-        }
-      );
           
     await interaction.followUp({
       embeds: [ embed ]

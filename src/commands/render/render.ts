@@ -83,7 +83,8 @@ export default class implements ICommand {
             choices: [
               {
                 name: 'rgb',
-                value: 'rgb'
+                value: 'rgb',
+                
               }, 
               {
                 name: 'hsl',
