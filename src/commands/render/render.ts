@@ -19,6 +19,7 @@ import TwUtils from '../../services/apis/twutils';
 import ErrorEmbed from '../../utils/msg';
 
 import { files } from '../../utils/files';
+import parseCommandOptions from '../../utils/commandOptions';
 
 const eyesArgument: any = {
   name: 'eyes',
@@ -137,15 +138,14 @@ export default class implements ICommand {
     args: Array<CommandInteractionOption>
   ) {
     const [ subCommand ] = args;
-    const [ 
-      skinId, colorMode, bodyColor, feetColor, eyes
-    ] = subCommand.options.map(option => option.value.toString());
 
+    const options = parseCommandOptions(subCommand);
     const interaction = message as CommandInteraction<CacheType>;
+
     await interaction.deferReply({ ephemeral: true });
 
     // Get skins info
-    const info = await Teedata.assetInfo(skinId);
+    const info = await Teedata.assetInfo(options.id);
 
     if (info === null || info.type !== 'skin') {
       await interaction.followUp({
@@ -158,22 +158,23 @@ export default class implements ICommand {
 
     // Raw bytes PNG
     let imageRawBytes: Uint8Array | null;
+    const eye = options.eyes || 'default_eye';
   
     if (subCommand.name === 'custom') {
       imageRawBytes = await TwUtils.renderSkinColor(
         {
           skin: skinUrl,
-          eye: eyes || 'default_eye',
-          bcolor: bodyColor,
-          fcolor: feetColor,
-          mode: colorMode
+          eye,
+          bcolor: options.body,
+          fcolor: options.feet,
+          mode: options.mode
         }
       );
     } else {
       imageRawBytes = await TwUtils.renderSkin(
         {
           skin: skinUrl,
-          eye: eyes || 'default_eye'
+          eye
         }
       );
     }
