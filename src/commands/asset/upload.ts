@@ -108,6 +108,7 @@ export default class implements ICommand {
         { name: 'Category', value: category.value.toString(), inline: true },
         { name: 'Author', value: author.value.toString(), inline: true }
       ])
+      .setImage(file.attachment.url)
           
     await interaction.followUp({
       embeds: [ embed ]

@@ -78,25 +78,12 @@ class Teedata {
   }
 
   static async assetUpload(data: UploadParams): Response {
-    try {
-      const req = await axios.post(
-        'https://api-staging.skins.tw/api/storeAsset/discord',
-        data,
-        {
-          headers: {
-            Accept: 'application/json',
-          }
-        },
-      );
-
-      if (req.status !== 200 || req.data.length === 0) {
-        return null;
-      }
-
-      return req.data;
-    } catch (error) {
-      return null;
-    }
+    return await this.commonRequest(
+      '/api/storeAsset/discord',
+      '',
+      axios.post,
+      data
+    );
   }
 
   static async isAssetDuplicate(hash: string): Promise<boolean> {
