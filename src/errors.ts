@@ -15,4 +15,6 @@ export class EventError extends BaseError { };
 export class DBError extends BaseError { };
 
 export class TwUtilsWrongResponse extends BaseError { };
-export class TeeDataWrongRespose extends BaseError { };
+export class TeeDataWrongResponse extends BaseError { };
+
+export class FileError extends BaseError { };

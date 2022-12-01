@@ -11,10 +11,16 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { Bot } from '../../bot';
 import ICommand from '../../interfaces/command';
-import TwUtils, { personalCardParams } from '../../services/apis/twutils';
+import { personalCardParams } from '../../services/apis/twutils';
 import parseCommandOptions from '../../utils/commandOptions';
 import sendDiscordRawImage from '../../utils/discordSendImage';
 import ErrorEmbed from '../../utils/msg';
+
+const NONE_FIELD = '-';
+const BACKGROUNDS_DIR = './data/scenes/backgrounds/';
+
+// Cards
+import { TwPersonalCard } from '../../services/cards/personal';
 
 export default class implements ICommand {
   name: string;
@@ -115,22 +121,32 @@ export default class implements ICommand {
     interaction: CommandInteraction<CacheType>,
     data: personalCardParams
   ) {
-    const cardRawBytes = await TwUtils.personalCard(data);
+    const path = uuidv4() + '.png';
+    const card = new TwPersonalCard()
+      .setUsername(data.username || NONE_FIELD)
+      .setClan(data.clan || NONE_FIELD)
+      .setGamemode(data.gamemode || NONE_FIELD)
+      .setSince(data.since || NONE_FIELD)
+      .setDescription(data.description || NONE_FIELD);
 
-    if (cardRawBytes === null) {
+    try {
+      await card.setRandomBackground(BACKGROUNDS_DIR);
+      await card.process();
+      card.save('.', path);
+
+    } catch (err) {
       await interaction.followUp({
-        embeds: [ ErrorEmbed.wrong('Unable to create this card') ]
+        embeds: [ ErrorEmbed.wrong() ]
       });
+    
       return;
     }
-    
-    const path = uuidv4() + '.png';
 
     await sendDiscordRawImage(
       interaction,
       {
         title: 'Personal card',
-        raw: cardRawBytes,
+        raw: card.canvas.toBuffer(),
         path
       }
     );
