@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios from 'axios';
 
 export type Response = Promise<any>;
 
@@ -29,8 +29,7 @@ class Teedata {
         data,
         {
           headers: {
-            'User-Agent': 'Mozilla/5.0',
-            Accept: 'application/json'
+            'User-Agent': 'Mozilla/5.0'
           },
         }
       );

@@ -72,16 +72,6 @@ export default class implements ICommand {
       })
       return;
     }
-
-    // Download the attachment
-    // const imageRawBytes = await downloadAsset(file.attachment.url);
-
-    // if (imageRawBytes === null) {
-    //   await interaction.followUp({
-    //     embeds: [ ErrorEmbed.wrong('Unable to upload this image')]
-    //   })
-    //   return;
-    // }
   
     // Upload the file to the server
     const asset = await Teedata.assetUpload(
@@ -92,10 +82,10 @@ export default class implements ICommand {
         url: file.attachment.url
       },
     );
-  
-    if (asset === null) {
+
+    if (asset === null || asset.success === false) {
       await interaction.followUp({
-        embeds: [ ErrorEmbed.wrong() ]
+        embeds: [ ErrorEmbed.wrong('Probably an invalid asset') ]
       })
       return;
     }

@@ -140,4 +140,4 @@ class Logs {
   }
 }
 
-export { Logs };
+export { Logs, LogOutput };
