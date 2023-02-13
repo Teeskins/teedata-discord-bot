@@ -17,6 +17,7 @@ services:
       npm run start
     environment:
       PORT: ${TW_UTILS_PORT}
+    restart: always
 
   # MongoDB
   teedata_mongo:
