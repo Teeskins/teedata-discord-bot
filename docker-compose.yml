@@ -2,26 +2,26 @@ version: "3.7"
 
 services:
   # MongoDB
-  asset_bot_mongo:
+  teedata_bot_mongo:
     image: mongo
-    container_name: asset_bot_mongo
+    container_name: teedata_bot_mongo
     volumes:
-      - mongodb:/data/db
+      - teedata_mongodb:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     restart: always
 
   # Discord bot
-  asset_bot:
+  teedata_bot:
     image: node:18
-    container_name: asset_bot
+    container_name: teedata_bot
     build: .
     environment:
-      MONGO: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@asset_bot_mongo?authSource=admin
+      MONGO: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@teedata_bot_mongo?authSource=admin
     depends_on:
-      - asset_bot_mongo
+      - teedata_bot_mongo
     restart: always
 
 volumes:
-  mongodb:
+  teedata_mongodb:
