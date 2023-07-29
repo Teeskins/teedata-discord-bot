@@ -1,6 +1,6 @@
 # 🚤 teedata-discord-bot
 
-![build](https://github.com/theobori/teedata-discord-bot/actions/workflows/build.yml/badge.svg)
+![build](https://github.com/Teeskins/teedata-discord-bot/actions/workflows/build.yml/badge.svg)
 
 ## 📖 Build and run
 
