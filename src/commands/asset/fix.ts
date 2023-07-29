@@ -9,13 +9,15 @@ import {
 
 import { v4 as uuidv4 } from 'uuid';
 
-import { Bot } from '../../bot';
-import ICommand from '../../interfaces/command';
-import TwUtils from '../../services/apis/twutils';
+import Bot from '../../bot';
+import ICommand from '../../command';
 import sendDiscordRawImage from '../../utils/discordSendImage';
 import ErrorEmbed from '../../utils/msg';
-import teedataCategories from '../../utils/teedataCategories';
-    
+import { assetKindArgument } from '../../utils/commonArguments';
+import { resolveAsset } from '../../services/asset';
+import { IAsset, fixAssetSize } from 'teeworlds-utilities';
+
+
 export default class implements ICommand {
   name: string;
   category: string;
@@ -28,18 +30,12 @@ export default class implements ICommand {
     this.description = 'Fix a Teeworlds asset with wrong size';
     this.options = [
       {
-        name: 'category',
-        type: ApplicationCommandOptionType.String,
-        required: true,
-        description: 'The asset category',
-        choices: teedataCategories
-      },
-      {
         name: 'image',
         type: ApplicationCommandOptionType.Attachment,
         required: true,
         description: 'The asset to fix'
       },
+      assetKindArgument,
     ];
   }
   
@@ -48,7 +44,7 @@ export default class implements ICommand {
     message: Message<boolean> | CommandInteraction<CacheType>,
     args: Array<CommandInteractionOption>
   ) {
-    const [ category, file ] = args;
+    const [ file, category ] = args;
   
     const interaction = message as CommandInteraction<CacheType>;
     await interaction.deferReply({ ephemeral: true });
@@ -61,25 +57,51 @@ export default class implements ICommand {
       return;
     }
 
-    const fixedAssetRawBytes = await TwUtils.fixAsset({
-      category: category.value.toString(),
-      path: file.attachment.url
-    });
+    let asset: IAsset;
 
-    if (fixedAssetRawBytes === null) {
-      await interaction.followUp({
-        embeds: [ ErrorEmbed.wrong('This asset probably already has a correct size or is invalid') ]
-      })
+    // Resolving an IAsset from the user string argument
+    try {
+      asset = resolveAsset(category.value.toString());
+
+      asset.setVerification(false);
+  
+      await asset.load(file.attachment.url);
+    } catch (error) {
+      await interaction.followUp(
+        {
+          embeds: [
+            ErrorEmbed.wrong(error.message)
+          ]
+        }
+      );
+
+      return;
+    }
+
+    // Process the wrong sized asset
+    const status = fixAssetSize(asset);
+
+    if (status === false) {
+      await interaction.followUp(
+        {
+          embeds: [
+            ErrorEmbed.wrong('This asset probably already has a correct size or is invalid')
+          ]
+        }
+      );
+
       return;
     }
 
     const path = uuidv4() + '.png';
 
+    asset.saveAs(path);
+
     await sendDiscordRawImage(
       interaction,
       {
         title: 'Fixed ' + category.value,
-        raw: fixedAssetRawBytes,
+        raw: asset.canvas.toBuffer(),
         path
       }
     );

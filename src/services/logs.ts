@@ -1,6 +1,13 @@
 import { FormattedDateTime } from '../utils/datetime';
 import { files } from '../utils/files';
+import dotenv from 'dotenv';
 
+dotenv.config();
+
+/**
+ * Represents the log level sorted by order of importance,
+ * `CRITICAL` being the most important and `DEBUG` least one.
+ */
 enum LogLevel {
   CRITICAL = 'CRITICAL',
   ERROR = 'ERROR',
@@ -9,12 +16,21 @@ enum LogLevel {
   DEBUG = 'DEBUG'
 }
 
-enum LogOutput {
+/**
+ * Log output descriptor.
+ */
+export enum LogOutput {
   STDOUT,
   FILE,
   ALL
 }
 
+const DIR = process.env.LOG_DIR || ".";
+
+/**
+ * Log class is a TypeScript implementation of a logging utility that allows
+ * users to set the logging level, message, and output destination.
+*/
 class Log {
   private level?: LogLevel;
   private message?: string;
@@ -26,25 +42,44 @@ class Log {
     this.logger = console.log;
   }
 
-  setLevel(level: LogLevel): Log {
+  /**
+   * The function sets the logging level and returns the Log object.
+   * @param {LogLevel} level - Log level
+   * @returns this
+   */
+  setLevel(level: LogLevel): this {
     this.level = level;
     
     return this;
   }
 
-  setMessage(message: string): Log {
+  /**
+   * This function sets a message for a log and returns the log object.
+   * @param {string} message - Log message
+   * @returns this
+   */
+  setMessage(message: string): this {
     this.message = message;
     
     return this;
   }
 
-  setOutput(output: LogOutput): Log {
+  /**
+   * Set an output kind
+   * @param output - Log output
+   * @returns this
+   */
+  setOutput(output: LogOutput): this {
     this.output = output;
 
     return this;
   }
 
-  private setLoggerWithLevel(): Log {
+  /**
+   * Set a logger
+   * @returns this
+   */
+  private setLoggerWithLevel(): this {
     switch (this.level) {
       case LogLevel.CRITICAL:
         this.logger = console.error;
@@ -59,7 +94,7 @@ class Log {
         this.logger = console.info;
         break;
       case LogLevel.DEBUG:
-        this.logger = console.trace;
+        this.logger = console.debug;
         break;
       default:
         this.logger = console.log;
@@ -69,11 +104,16 @@ class Log {
     return this;
   }
 
-  private writeOutput(output: LogOutput): Log {
+  /**
+   * Write to the output
+   * @param output - Log output 
+   * @returns this
+   */
+  private writeOutput(output: LogOutput): this {
     switch (output) {
       case LogOutput.FILE:
         const ext = '.log';
-        const filename = process.env.LOG_DIR + FormattedDateTime.date;
+        const filename = DIR + '/' + FormattedDateTime.date;
 
         files.append(filename + ext, this.message + '\n');
         break;
@@ -91,6 +131,9 @@ class Log {
     return this;
   }
 
+  /**
+   * The "run" function sets the logger level and writes the output.
+   */
   run() {
     this
       .setLoggerWithLevel()
@@ -98,15 +141,12 @@ class Log {
   }
 }
 
-class Logs {
-  // private static output(logOutput: LogOutput,)
-
+export class Logger {
   private static send(
     level: LogLevel,
     message: string,
     output: LogOutput
   ) {
-    // Quick message formatting
     const datetime = FormattedDateTime.datetime;
     const levelString = '[' + level + ']';
 
@@ -119,25 +159,27 @@ class Logs {
       .run();
   };
 
-  static critical(message: string, output: LogOutput = LogOutput.ALL) {
+  static critical(message: string, output: LogOutput = LogOutput.STDOUT) {
     this.send(LogLevel.CRITICAL, message, output);
   }
 
-  static error(message: string, output: LogOutput = LogOutput.ALL) {
+  static error(message: string, output: LogOutput = LogOutput.STDOUT) {
     this.send(LogLevel.ERROR, message, output);
   }
 
-  static warning(message: string, output: LogOutput = LogOutput.ALL) {
+  static warning(message: string, output: LogOutput = LogOutput.STDOUT) {
     this.send(LogLevel.WARNING, message, output);
   }
 
-  static info(message: string, output: LogOutput = LogOutput.ALL) {
+  static info(message: string, output: LogOutput = LogOutput.STDOUT) {
     this.send(LogLevel.INFO, message, output);
   }
 
-  static debug(message: string, output: LogOutput = LogOutput.ALL) {
+  static debug(message: string, output: LogOutput = LogOutput.STDOUT) {
+    if (!process.env.DEBUG) {
+      return;
+    }
+
     this.send(LogLevel.DEBUG, message, output);
   }
 }
-
-export { Logs, LogOutput };

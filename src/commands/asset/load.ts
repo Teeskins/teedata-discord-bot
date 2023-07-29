@@ -8,11 +8,10 @@ import {
   Message,
 } from 'discord.js';
 
-import { Bot } from '../../bot';
-import ICommand from '../../interfaces/command';
+import Bot from '../../bot';
+import ICommand from '../../command';
 import Teedata from '../../services/apis/teedata';
 import ErrorEmbed from '../../utils/msg';
-import teedataCategories from '../../utils/teedataCategories';
   
 export default class implements ICommand {
   name: string;
@@ -64,10 +63,12 @@ export default class implements ICommand {
         name: asset.uploaded_by.name,
         iconURL: asset.uploaded_by.profile_photo_url
       })
-      .setColor(0x000000);
+      .setColor(0x2b2d31);
 
-    await interaction.followUp({
-      embeds: [ embed ]
-    })
+    await interaction.followUp(
+      {
+        embeds: [ embed ]
+      }
+    );
   };
 }

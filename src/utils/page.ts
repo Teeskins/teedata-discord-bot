@@ -1,4 +1,4 @@
-class Page<T> {
+export default class Page<T> {
   private contents: T[][] = [[]];
   index: number = 0;
   maxLines: number;
@@ -105,5 +105,3 @@ class Page<T> {
     return this.contents.length;
   }
 }
-
-export default Page;

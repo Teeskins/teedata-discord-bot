@@ -1,58 +1,40 @@
-# teedata-discord-bot
+# 🚤 teedata-discord-bot
 
-## How to build and run ?
+![build](https://github.com/theobori/teedata-discord-bot/actions/workflows/build.yml/badge.svg)
 
-1. Install the dependencies 
-- Mongo (only if you want a local instance)
-- NodeJS
+## 📖 Build and run
 
-```bash
-npm i
-```
+You only need one of the following requirements:
 
-1. Create the environments files:
-    - `env` using `.env_example`
+- [NodeJS](https://nodejs.org/en/download)
+  - 18.x
+  - 20.x
 
-2. Run the project with the instructions below.
+You need a `.env` file, you can copy `.example.env` and fill the missing values.
 
-### Production
+### Standalone container
 
-```bash
-npm run build
-npm run start
-```
+You can use the `Dockerfile` at the project root, but you will need a MongoDB isntance anyway.
 
-### Development
+### With Docker Compose
 
-```bash
-npm run dev
-```
-
-## Docker
-
-**Download the submodules**
-```bash
-git submodule init
-git submodule update
-```
-
-**Launch containers**
-
-You need some environment variables:
-
+The containers need the following environment variables:
 - `MONGO_INITDB_ROOT_USERNAME`
 - `MONGO_INITDB_ROOT_PASSWORD`
-- `TW_UTILS_PORT`
+
+If you want to build it for development, you can run:
 
 ```bash
-TW_UTILS_PORT=3000 \
-MONGO_INITDB_ROOT_USERNAME=user \
-MONGO_INITDB_ROOT_PASSWORD=test \
-docker-compose up
+docker compose -f docker-compose.dev.yml up -d
 ```
 
-**Reset environment variables (cache) for MongoDB**
+For production:
 
 ```bash
-docker-compose rm -fv bot_mongo
+docker compose build
+docker compose up -d
 ```
+
+## 🤝 Contribute
+
+If you want to help the project, you can follow the guidelines in [CONTRIBUTING.md](./CONTRIBUTING.md).

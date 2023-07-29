@@ -6,11 +6,11 @@ enum ErrorMessage {
   MISSING_PERMISSION = '⛔️ Missing permission(s)',
 }
 
-class ErrorEmbed {
+export default class ErrorEmbed {
   static wrong(details: string = ''): EmbedBuilder {
     const embed = new EmbedBuilder()
       .setTitle(ErrorMessage.WRONG_ERROR_MSG)
-      .setColor(0x000000);
+      .setColor(0x2b2d31);
 
     if (details) {
       embed.setDescription('**Hint**: ' + details);
@@ -22,14 +22,12 @@ class ErrorEmbed {
   static notFound(): EmbedBuilder {
     return new EmbedBuilder()
       .setTitle(ErrorMessage.NOT_FOUND_ERROR_MSG)
-      .setColor(0x000000);
+      .setColor(0x2b2d31);
   }
 
   static missingPermission(): EmbedBuilder {
     return new EmbedBuilder()
       .setTitle(ErrorMessage.MISSING_PERMISSION)
-      .setColor(0x000000);
+      .setColor(0x2b2d31);
   }
 }
-
-export default ErrorEmbed;

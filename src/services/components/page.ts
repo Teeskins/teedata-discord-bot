@@ -4,17 +4,24 @@ import {
   ButtonStyle,
   EmbedBuilder,
   MessagePayload,
-  WebhookEditMessageOptions,
   CommandInteraction,
-  CacheType
+  CacheType,
+  InteractionReplyOptions
 } from 'discord.js';
 
 import { v4 as uuidv4 } from 'uuid';
 
-import IPageComponent from '../../interfaces/pageComponent';
 import Page from '../../utils/page';
 
-abstract class AbstractPageComponent<T> extends Page<T> implements IPageComponent {
+export interface IPageComponent {
+  collect: () => void;
+  reply: () => void;
+}
+
+export default abstract class AbstractPageComponent<T>
+  extends Page<T>
+  implements IPageComponent
+{
   protected message: CommandInteraction<CacheType>;
 
   protected previousId: string;
@@ -60,7 +67,7 @@ abstract class AbstractPageComponent<T> extends Page<T> implements IPageComponen
   }
 
   protected createOptions()
-  : string | MessagePayload | WebhookEditMessageOptions {
+  : string | MessagePayload | InteractionReplyOptions {
     return {
       embeds: [ this.createEmbed() ],
       components: [ this.createButtons() ]
@@ -104,5 +111,3 @@ abstract class AbstractPageComponent<T> extends Page<T> implements IPageComponen
     await this.message.reply(this.createOptions());
   }
 }
-
-export default AbstractPageComponent;

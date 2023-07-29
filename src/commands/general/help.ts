@@ -11,8 +11,8 @@ import {
 } from 'discord.js';
 import { join } from 'path';
 
-import { Bot } from '../../bot';
-import ICommand, { isICommand } from '../../interfaces/command';
+import Bot from '../../bot';
+import ICommand, { isICommand } from '../../command';
 import AbstractPageComponent from '../../services/components/page';
 import capitalize from '../../utils/capitalize';
 import parseCommandOptions from '../../utils/commandOptions';
@@ -48,7 +48,7 @@ extends AbstractPageComponent<CommandBasic> {
   createEmbed(): EmbedBuilder {
     return new EmbedBuilder()
       .setTitle('Command list')
-      .setColor(0x000000)
+      .setColor(0x2b2d31)
       .addFields(this.autoCreateFields())
       .setFooter(
         {
@@ -165,11 +165,13 @@ export default class implements ICommand {
       await interaction.followUp({
         embeds: [ ErrorEmbed.wrong('This command doesn\'t exist') ]
       });
+
       return;
     }
 
     const embed = new EmbedBuilder()
       .setTitle(commandName)
+      .setColor(0x2b2d31)
       .addFields({ name: 'Description', value: command.description });
     
     if (command.extraDescription) {
@@ -200,6 +202,9 @@ export default class implements ICommand {
 
       case 'detail':
         await this.detailCommand(interaction, options.name);
+        break;
+      
+      default:
         break;
     }
   }

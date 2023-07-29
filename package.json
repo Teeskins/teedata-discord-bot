@@ -19,15 +19,15 @@
   "homepage": "https://github.com/Teeskins/teedata-discordbot.git#readme",
   "dependencies": {
     "axios": "^0.27.2",
-    "discord.js": "^14.3.0",
+    "canvas": "^2.9.1",
+    "color-convert": "^2.0.1",
+    "discord.js": "^14.11.0",
     "dotenv": "^10.0.0",
     "fs": "^0.0.1-security",
-    "memfs": "^3.4.7",
     "mongoose": "^6.5.2",
     "path": "^0.12.7",
+    "teeworlds-utilities": "^1.1.9",
     "ts-node": "^10.9.1",
-    "uuid": "^9.0.0",
-    "canvas": "^2.9.1",
-    "color-convert": "^2.0.1"
+    "uuid": "^9.0.0"
   }
 }

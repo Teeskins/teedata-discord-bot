@@ -9,8 +9,8 @@ import {
   Message,
 } from 'discord.js';
   
-import { Bot } from '../../bot';
-import ICommand from '../../interfaces/command';
+import Bot from '../../bot';
+import ICommand from '../../command';
 import AbstractPageComponent from '../../services/components/page';
 import Teedata from '../../services/apis/teedata';
 import capitalize from '../../utils/capitalize';

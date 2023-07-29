@@ -6,13 +6,13 @@ import {
 import { join } from 'path';
 
 import { CommandError, EventError } from './errors';
-import ICommand, { isICommand } from './interfaces/command';
+import ICommand, { isICommand } from './command';
 
 import { files } from './utils/files';
 
 import database from "./services/database/database";
 
-class Bot extends Client {
+export default class Bot extends Client {
   private readonly commandsDir: string = 'commands/';
   private readonly eventsDir: string = 'events/';
 
@@ -76,5 +76,3 @@ class Bot extends Client {
     }
   }
 }
-
-export { Bot };

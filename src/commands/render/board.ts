@@ -9,13 +9,13 @@ import {
 
 import Bot from '../../bot';
 import ICommand from '../../command';
-import parseCommandOptions from '../../utils/commandOptions';
 import { unlinkSync } from 'fs';
-import { SkinInteraction } from '../../services/renderSkin';
+import { BoardInteraction } from '../../services/renderSkin';
+import parseCommandOptions from '../../utils/commandOptions';
 import ErrorEmbed from '../../utils/msg';
-import { colorModesArgument, eyeArgument, weaponArgument } from '../../utils/commonArguments';
+import { colorModesArgument } from '../../utils/commonArguments';
 
-const renderOptionalArguments = [
+const renderOptionalArguments: any = [
   {
     name: 'crop',
     type: ApplicationCommandOptionType.Boolean,
@@ -28,14 +28,18 @@ const renderOptionalArguments = [
     description: 'The direction in which the tee looks',
     required: false
   },
-  weaponArgument,
   {
     name: 'gameskin',
     type: ApplicationCommandOptionType.Attachment,
     required: false,
     description: 'The skin image',
   },
-  eyeArgument
+  {
+    name: 'amount',
+    type: ApplicationCommandOptionType.Number,
+    required: false,
+    description: 'The skin emote and weapon amount on the board',
+  }
 ];
 
 export default class implements ICommand {
@@ -46,13 +50,13 @@ export default class implements ICommand {
   options: ApplicationCommandOption[];
     
   constructor() {
-    this.name = 'render';
+    this.name = 'board';
     this.category = 'render';
-    this.description = 'Render a Teeworlds skin';
+    this.description = 'Creates a view with an assembled skin for each emote associated with a weapon';
     this.options = [
       {
         name: 'default',
-        description: 'Render a Teeworlds skin',
+        description: 'Creates a board ',
         type: ApplicationCommandOptionType.Subcommand,
         options: [
           {
@@ -66,7 +70,7 @@ export default class implements ICommand {
       },
       {
         name: 'color',
-        description: 'Render a Teeworlds skin with custom colors',
+        description: 'Creates a board with custom colors',
         type: ApplicationCommandOptionType.Subcommand,
         options: [
           {
@@ -105,12 +109,13 @@ export default class implements ICommand {
 
     await interaction.deferReply({ ephemeral: true });
 
-    const skinInteraction = new SkinInteraction()
+    const boardInteraction = new BoardInteraction()
       .setInteraction(interaction)
       .setOptions(options)
       .setSubCommand(subCommand);
   
-    if (await skinInteraction.load() === false) {
+    // config
+    if (await boardInteraction.load() === false) {
       await interaction.followUp(
         {
           embeds: [ ErrorEmbed.wrong() ],
@@ -121,9 +126,11 @@ export default class implements ICommand {
       return;
     }
     
-    await skinInteraction.process();
-    await skinInteraction.send();
+    await boardInteraction.process();
+    await boardInteraction.send();
 
-    unlinkSync(skinInteraction.path);
+    unlinkSync(boardInteraction.path);
+
   };
 }
+

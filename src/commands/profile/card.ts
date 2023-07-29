@@ -9,18 +9,15 @@ import {
 
 import { v4 as uuidv4 } from 'uuid';
 
-import { Bot } from '../../bot';
-import ICommand from '../../interfaces/command';
-import { personalCardParams } from '../../services/apis/twutils';
-import parseCommandOptions from '../../utils/commandOptions';
+import Bot from '../../bot';
+import ICommand from '../../command';
+import parseCommandOptions, { ParsedOptions } from '../../utils/commandOptions';
 import sendDiscordRawImage from '../../utils/discordSendImage';
 import ErrorEmbed from '../../utils/msg';
+import { PersonalCard } from 'teeworlds-utilities';
 
 const NONE_FIELD = '-';
-const BACKGROUNDS_DIR = './data/scenes/backgrounds/';
-
-// Cards
-import { TwPersonalCard } from '../../services/cards/personal';
+const BACKGROUNDS_DIR = './data/backgrounds/';
 
 export default class implements ICommand {
   name: string;
@@ -119,25 +116,27 @@ export default class implements ICommand {
 
   private async personalCardCommand(
     interaction: CommandInteraction<CacheType>,
-    data: personalCardParams
+    options: ParsedOptions
   ) {
     const path = uuidv4() + '.png';
-    const card = new TwPersonalCard()
-      .setUsername(data.username || NONE_FIELD)
-      .setClan(data.clan || NONE_FIELD)
-      .setGamemode(data.gamemode || NONE_FIELD)
-      .setSince(data.since || NONE_FIELD)
-      .setDescription(data.description || NONE_FIELD);
+    const card = new PersonalCard()
+      .setUsername(options.username || NONE_FIELD)
+      .setClan(options.clan || NONE_FIELD)
+      .setGamemode(options.gamemode || NONE_FIELD)
+      .setSince(options.since || NONE_FIELD)
+      .setDescription(options.description || NONE_FIELD);
 
     try {
       await card.setRandomBackground(BACKGROUNDS_DIR);
       await card.process();
-      card.save('.', path);
 
+      card.save(path);
     } catch (err) {
-      await interaction.followUp({
-        embeds: [ ErrorEmbed.wrong() ]
-      });
+      await interaction.followUp(
+        {
+          embeds: [ ErrorEmbed.wrong() ]
+        }
+      );
     
       return;
     }
@@ -176,13 +175,7 @@ export default class implements ICommand {
       case 'personal':
         await this.personalCardCommand(
           interaction,
-          {
-            username: options.username,
-            clan: options.clan,
-            since: options.since,
-            gamemode: options.gamemode,
-            description: options.description,
-          }
+          options
         );
         break;
 

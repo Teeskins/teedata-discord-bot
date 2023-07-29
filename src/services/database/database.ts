@@ -1,12 +1,17 @@
 import 'dotenv/config';
-import { MongoClient, Collection, Document } from 'mongodb';
+import { MongoClient, Collection, Document, Db } from 'mongodb';
 
 import { DBError } from '../../errors';
-import IConnection from '../../interfaces/connection';
 
-import { Logs } from "../../services/logs";
+import { Logger } from "../../services/logs";
 
-class Mongo {
+interface IConnection {
+  client: MongoClient;
+  db: Db;
+  collections: Record<string, Collection<Document>>
+}
+
+export default class Mongo {
   private static conn?: IConnection = undefined;
 
   static createConnection(): IConnection {
@@ -18,12 +23,12 @@ class Mongo {
       const client = new MongoClient(process.env.MONGO);
       const db = client.db(process.env.DATABASE);
       const collections = {
-        'invite': db.collection('invite')
+        'listener': db.collection('listener')
       };
 
       Mongo.conn = { client, db, collections };
 
-      Logs.info("[+] Connection to the database created");
+      Logger.info("[+] Connection to the database created");
 
       return Mongo.conn;
     } catch (error) {
@@ -39,5 +44,3 @@ class Mongo {
     return this.conn.collections;
   }
 }
-
-export default Mongo;

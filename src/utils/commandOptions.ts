@@ -3,9 +3,9 @@ import {
   CommandInteractionOption
 } from 'discord.js';
 
-type ParsedOptions = {[key: string]: any};
+export type ParsedOptions = {[key: string]: any};
 
-function parseCommandOptions(
+export default function parseCommandOptions(
   command: CommandInteractionOption<CacheType>
 ): ParsedOptions {
   let options = {};
@@ -15,10 +15,8 @@ function parseCommandOptions(
   }
 
   for (const option of command.options) {
-    options[option.name] = option.value;
+    options[option.name] = option.attachment || option.value;
   }
 
   return options;
 }
-
-export default parseCommandOptions;

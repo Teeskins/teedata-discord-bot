@@ -10,7 +10,7 @@ import {
 
 import { join } from 'path';
 
-const dirs = {
+export const dirs = {
   list: function(path: string): string[] {
     return readdirSync(path, { withFileTypes: true })
     	.filter(dirent => dirent.isDirectory())
@@ -18,7 +18,7 @@ const dirs = {
   },
 }
 
-const files = {
+export const files = {
   list: function(path: string): string[] {
     return readdirSync(path);
   },
@@ -51,8 +51,13 @@ const files = {
 
   append(path: PathOrFileDescriptor, data: string) {
     appendFileSync(path, data);
+  },
+
+  getName(path: string): string {
+    return path
+      .split('/')
+      .at(-1)
+      .split(".")
+      .at(0);
   }
-
 }
-
-export { dirs, files };

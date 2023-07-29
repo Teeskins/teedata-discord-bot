@@ -1,10 +1,10 @@
 import {
   CommandInteractionOption,
-  Interaction 
+  Interaction
 } from 'discord.js';
 
-import { Bot } from '../bot';
-import { Logs } from '../services/logs';
+import Bot from '../bot';
+import { Logger } from '../services/logs';
 
 export default function interactionCreate(
   bot: Bot,
@@ -23,7 +23,7 @@ export default function interactionCreate(
   const command = bot.commands.get(interaction.commandName);
   const user = interaction.user;
 
-  Logs.info(
+  Logger.info(
     user.username + '#' + user.discriminator +
     ' used /' + interaction.commandName + 
     ' in #' + interaction.channel.name +

@@ -8,12 +8,12 @@ import {
   Message,
 } from 'discord.js';
 
-import { Bot } from '../../bot';
-import ICommand from '../../interfaces/command';
+import Bot from '../../bot';
+import ICommand from '../../command';
 import Teedata from '../../services/apis/teedata';
 import ErrorEmbed from '../../utils/msg';
-import teedataCategories from '../../utils/teedataCategories';
-    
+import { teedataCategories } from '../../utils/commonArguments';
+
 export default class implements ICommand {
   name: string;
   category: string;
