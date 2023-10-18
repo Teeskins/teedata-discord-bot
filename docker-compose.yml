@@ -14,7 +14,7 @@ services:
 
   # Discord bot
   teedata_bot:
-    image: node:18
+    image: teedata
     container_name: teedata_bot
     build: .
     environment:
