@@ -15,10 +15,12 @@ import Bot from '../../bot';
 import ICommand from '../../command';
 import { assetKindArgument} from '../../utils/commonArguments';
 import { formatAssetParts, resolveAsset, resolvePartExpression } from '../../services/asset';
-import { EmoticonPart, GameskinPart, IAsset, ParticulePart, SkinPart } from 'teeworlds-utilities';
+import { AssetPart, EmoticonPart, GameskinPart, IAsset, ParticulePart, SkinPart } from 'teeworlds-utilities';
 import parseCommandOptions, { ParsedOptions } from '../../utils/commandOptions';
 import ErrorEmbed from '../../utils/msg';
 import { unlink } from 'fs/promises';
+import Teedata from '../../services/apis/teedata';
+import { getAssetPartsMetadata } from 'teeworlds-utilities/build/main/asset/part';
 
 // enum FileOutput {
 //   ZIP = 'zip',
@@ -106,6 +108,22 @@ export default class implements ICommand {
             type: ApplicationCommandOptionType.String,
             required: true,
             description: 'Represents the targeted parts',
+          },
+        ]
+      },
+      {
+        name: 'random',
+        description: 'Replace random asset part(s) from random Teeworlds assets',
+        type: ApplicationCommandOptionType.Subcommand,
+        options: [
+          assetKindArgument,
+          {
+            name: 'number',
+            type: ApplicationCommandOptionType.Number,
+            minValue: 2,
+            maxValue: 10,
+            required: true,
+            description: 'Number of selected random assets',
           },
         ]
       },
@@ -222,6 +240,85 @@ export default class implements ICommand {
     await unlink(path);
   }
 
+  private async getRandomTeedataAssets(
+    assetKind: string,
+    n: number
+  ): Promise<IAsset[]> {
+    let sources = []
+
+    for (let i = 0; i < n; i++) {
+      const asset = await Teedata.assetRandom(assetKind);
+
+      if (asset === null) {
+        continue;
+      }
+
+      const assetUrl = process.env.TEEDATA_HOST + asset.path;
+
+      let source = await this.loadAsset(
+        assetKind,
+        assetUrl
+      );
+
+      if (source === null) {
+        continue
+      }
+
+      sources.push(source)
+    }
+
+    return sources;
+  }
+
+  private async randomAsset(
+    interaction: CommandInteraction<CacheType>,
+    options: ParsedOptions
+  ) {
+    let sources = await this.getRandomTeedataAssets(
+      options.assetkind,
+      options.number + 1,
+    )
+
+    if (sources.length === 0) {
+      await interaction.followUp(
+        {
+          embeds: [ ErrorEmbed.wrong("Unable to get assets") ]
+        }
+      );
+      
+      return
+    }
+
+    let destination = sources.pop()
+    let parts = Object.keys(
+      getAssetPartsMetadata(destination.metadata.kind)
+    )
+
+    for (const source of sources) {
+      for (let i = 0; i < Math.floor(Math.random() * 5); i++) {
+        let index = Math.floor(Math.random() * parts.length)
+        let part = parts[index]
+
+        destination.copyPart(
+          source,
+          part as AssetPart
+        )
+      }
+    }
+
+    const path = uuidv4() + '.png';
+    
+    destination.saveAs(path);
+
+    await interaction.followUp(
+      {
+        files: [ new AttachmentBuilder(path)]
+      }
+    )
+
+    await unlink(path);
+  }
+
   async run(
     _bot: Bot,
     message: Message<boolean> | CommandInteraction<CacheType>,
@@ -240,6 +337,10 @@ export default class implements ICommand {
       
       case 'replace':
         await this.replaceAsset(interaction, options);
+        break;
+      
+      case 'random':
+        await this.randomAsset(interaction, options);
         break;
     
       default:
