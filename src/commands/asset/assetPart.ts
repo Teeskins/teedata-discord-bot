@@ -20,7 +20,7 @@ import parseCommandOptions, { ParsedOptions } from '../../utils/commandOptions';
 import ErrorEmbed from '../../utils/msg';
 import { unlink } from 'fs/promises';
 import Teedata from '../../services/apis/teedata';
-import { getAssetPartsMetadata } from 'teeworlds-utilities/build/main/asset/part';
+import { AssetKind, getAssetPartsMetadata } from 'teeworlds-utilities/build/main/asset/part';
 
 // enum FileOutput {
 //   ZIP = 'zip',
@@ -30,6 +30,46 @@ import { getAssetPartsMetadata } from 'teeworlds-utilities/build/main/asset/part
 const assetExtraDescription = `Concerning the expression for the asset parts
 
 It must be the following format \`part1,part2,part3,etc...\``
+
+const linkedAssetParts = {
+  [AssetKind.SKIN]: [
+    [
+      SkinPart.DEFAULT_EYE,
+      SkinPart.ANGRY_EYE,
+      SkinPart.BLINK_EYE,
+      SkinPart.HAPPY_EYE,
+      SkinPart.CROSS_EYE,
+      SkinPart.SCARY_EYE,
+    ],
+    [
+      SkinPart.BODY, SkinPart.BODY_SHADOW
+    ],
+    [
+      SkinPart.HAND, SkinPart.HAND_SHADOW
+    ],
+    [
+      SkinPart.FOOT, SkinPart.FOOT_SHADOW
+    ]
+  ]
+}
+
+const getLinkedAssetParts = (kind: AssetKind, part: AssetPart): [AssetPart] => {
+  let kinds = Object.keys(linkedAssetParts);
+
+  if (kinds.includes(kind) === false) {
+    return [part];
+  }
+
+  let partsGroup = linkedAssetParts[kind];
+
+  for (const parts of partsGroup) {
+    if (parts.includes(part) === true) {
+      return parts
+    }
+  }
+
+  return [part];
+}
 
 export default class implements ICommand {
   name: string;
@@ -290,8 +330,9 @@ export default class implements ICommand {
     }
 
     let destination = sources.pop()
+    let kind = destination.metadata.kind
     let parts = Object.keys(
-      getAssetPartsMetadata(destination.metadata.kind)
+      getAssetPartsMetadata(kind)
     )
 
     for (const source of sources) {
@@ -299,9 +340,9 @@ export default class implements ICommand {
         let index = Math.floor(Math.random() * parts.length)
         let part = parts[index]
 
-        destination.copyPart(
+        destination.copyParts(
           source,
-          part as AssetPart
+          ...getLinkedAssetParts(kind, part as AssetPart)
         )
       }
     }
