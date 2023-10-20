@@ -24,7 +24,7 @@ export const resolveAsset = (asset: string): IAsset => {
       ret = new Emoticon();
       break;
 
-    case 'particule':
+    case 'particle':
       ret = new Particule();
       break;
 

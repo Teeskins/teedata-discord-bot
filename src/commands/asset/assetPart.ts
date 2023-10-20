@@ -15,12 +15,10 @@ import Bot from '../../bot';
 import ICommand from '../../command';
 import { assetKindArgument} from '../../utils/commonArguments';
 import { formatAssetParts, resolveAsset, resolvePartExpression } from '../../services/asset';
-import { AssetPart, EmoticonPart, GameskinPart, IAsset, ParticulePart, SkinPart } from 'teeworlds-utilities';
+import { EmoticonPart, GameskinPart, IAsset, ParticulePart, SkinPart } from 'teeworlds-utilities';
 import parseCommandOptions, { ParsedOptions } from '../../utils/commandOptions';
 import ErrorEmbed from '../../utils/msg';
 import { unlink } from 'fs/promises';
-import Teedata from '../../services/apis/teedata';
-import { AssetKind, getAssetPartsMetadata } from 'teeworlds-utilities/build/main/asset/part';
 
 // enum FileOutput {
 //   ZIP = 'zip',
@@ -30,46 +28,6 @@ import { AssetKind, getAssetPartsMetadata } from 'teeworlds-utilities/build/main
 const assetExtraDescription = `Concerning the expression for the asset parts
 
 It must be the following format \`part1,part2,part3,etc...\``
-
-const linkedAssetParts = {
-  [AssetKind.SKIN]: [
-    [
-      SkinPart.DEFAULT_EYE,
-      SkinPart.ANGRY_EYE,
-      SkinPart.BLINK_EYE,
-      SkinPart.HAPPY_EYE,
-      SkinPart.CROSS_EYE,
-      SkinPart.SCARY_EYE,
-    ],
-    [
-      SkinPart.BODY, SkinPart.BODY_SHADOW
-    ],
-    [
-      SkinPart.HAND, SkinPart.HAND_SHADOW
-    ],
-    [
-      SkinPart.FOOT, SkinPart.FOOT_SHADOW
-    ]
-  ]
-}
-
-const getLinkedAssetParts = (kind: AssetKind, part: AssetPart): [AssetPart] => {
-  let kinds = Object.keys(linkedAssetParts);
-
-  if (kinds.includes(kind) === false) {
-    return [part];
-  }
-
-  let partsGroup = linkedAssetParts[kind];
-
-  for (const parts of partsGroup) {
-    if (parts.includes(part) === true) {
-      return parts
-    }
-  }
-
-  return [part];
-}
 
 export default class implements ICommand {
   name: string;
@@ -151,22 +109,6 @@ export default class implements ICommand {
           },
         ]
       },
-      {
-        name: 'random',
-        description: 'Replace random asset part(s) from random Teeworlds assets',
-        type: ApplicationCommandOptionType.Subcommand,
-        options: [
-          assetKindArgument,
-          {
-            name: 'number',
-            type: ApplicationCommandOptionType.Number,
-            minValue: 2,
-            maxValue: 10,
-            required: true,
-            description: 'Number of selected random assets',
-          },
-        ]
-      },
     ];
   }
 
@@ -189,7 +131,7 @@ export default class implements ICommand {
           value: formatAssetParts(EmoticonPart)
         },
         {
-          name: 'Particule parts',
+          name: 'Particle parts',
           value: formatAssetParts(ParticulePart)
         }
       );
@@ -280,86 +222,6 @@ export default class implements ICommand {
     await unlink(path);
   }
 
-  private async getRandomTeedataAssets(
-    assetKind: string,
-    n: number
-  ): Promise<IAsset[]> {
-    let sources = []
-
-    for (let i = 0; i < n; i++) {
-      const asset = await Teedata.assetRandom(assetKind);
-
-      if (asset === null) {
-        continue;
-      }
-
-      const assetUrl = process.env.TEEDATA_HOST + asset.path;
-
-      let source = await this.loadAsset(
-        assetKind,
-        assetUrl
-      );
-
-      if (source === null) {
-        continue
-      }
-
-      sources.push(source)
-    }
-
-    return sources;
-  }
-
-  private async randomAsset(
-    interaction: CommandInteraction<CacheType>,
-    options: ParsedOptions
-  ) {
-    let sources = await this.getRandomTeedataAssets(
-      options.assetkind,
-      options.number + 1,
-    )
-
-    if (sources.length === 0) {
-      await interaction.followUp(
-        {
-          embeds: [ ErrorEmbed.wrong("Unable to get assets") ]
-        }
-      );
-      
-      return
-    }
-
-    let destination = sources.pop()
-    let kind = destination.metadata.kind
-    let parts = Object.keys(
-      getAssetPartsMetadata(kind)
-    )
-
-    for (const source of sources) {
-      for (let i = 0; i < Math.floor(Math.random() * 5); i++) {
-        let index = Math.floor(Math.random() * parts.length)
-        let part = parts[index]
-
-        destination.copyParts(
-          source,
-          ...getLinkedAssetParts(kind, part as AssetPart)
-        )
-      }
-    }
-
-    const path = uuidv4() + '.png';
-    
-    destination.saveAs(path);
-
-    await interaction.followUp(
-      {
-        files: [ new AttachmentBuilder(path)]
-      }
-    )
-
-    await unlink(path);
-  }
-
   async run(
     _bot: Bot,
     message: Message<boolean> | CommandInteraction<CacheType>,
@@ -380,10 +242,6 @@ export default class implements ICommand {
         await this.replaceAsset(interaction, options);
         break;
       
-      case 'random':
-        await this.randomAsset(interaction, options);
-        break;
-    
       default:
         break;
     }

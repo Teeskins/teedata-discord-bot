@@ -91,20 +91,20 @@ export const assetKindArgument: any = {
   required: true,
   choices: [
     {
-      name: 'Skin',
+      name: 'skin',
       value: 'skin',
     },
     {
-      name: 'Gameskin',
+      name: 'gameskin',
       value: 'gameskin'
     },
     {
-      name: 'Emoticon',
+      name: 'emoticon',
       value: 'emoticon',
     },
     {
-      name: 'Particule',
-      value: 'particule',
+      name: 'particle',
+      value: 'particle',
     },
   ]
 };
