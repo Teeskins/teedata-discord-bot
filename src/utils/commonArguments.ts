@@ -1,4 +1,7 @@
 import { ApplicationCommandOptionChoiceData, ApplicationCommandOptionType } from "discord.js";
+import { EmoticonPart } from "teeworlds-utilities";
+import capitalize from './capitalize';
+
 
 export const eyeArgument: any = {
   name: 'eyes',
@@ -147,3 +150,26 @@ export const teedataCategories: ApplicationCommandOptionChoiceData<string>[] = [
     value: 'gridTemplate'
   },
 ];
+
+function argumentFromEnum<T extends { [key: number]: string }>(e: T): any {
+  let ret = []
+
+  for (let [k, v] of Object.entries(e)) {
+    ret.push(
+      {
+        'name': capitalize(k.toLowerCase()),
+        'value': v
+      }
+    )
+  }
+
+  return ret
+}
+
+export const EmoticonPartArgument: any = {
+  name: 'emoticonpart',
+  type: ApplicationCommandOptionType.String,
+  description: 'The emoticon part',
+  required: false,
+  choices: argumentFromEnum(EmoticonPart)
+};
