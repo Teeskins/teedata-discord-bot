@@ -22,6 +22,7 @@ services:
     - |
       npm i
       npm run dev
+    env_file: .env
     environment:
       MONGO_URI: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@asset_bot_mongo?authSource=admin
     depends_on:
